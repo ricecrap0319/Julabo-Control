@@ -242,10 +242,14 @@ class App(tk.Tk):
                   bg=RED, fg="#1e1e2e", relief="flat", padx=20, pady=8,
                   command=self._stop).pack(side="left", padx=8)
 
-        # status bar
-        self.lbl_msg = tk.Label(self, text="", font=("Segoe UI", 9),
+        # status bar + reset usb
+        bot = tk.Frame(self, bg=BG); bot.pack(fill="x", padx=12, pady=(0, 8))
+        self.lbl_msg = tk.Label(bot, text="", font=("Segoe UI", 9),
                                 bg=BG, fg=DIM, anchor="w")
-        self.lbl_msg.pack(fill="x", padx=12, pady=(0, 8))
+        self.lbl_msg.pack(side="left", fill="x", expand=True)
+        tk.Button(bot, text="Reset USB", font=("Segoe UI", 9), bg="#45475a", fg=FG,
+                  relief="flat", padx=8, command=self._reset_usb
+                  ).pack(side="right")
 
     # ── connection ────────────────────────────────────────────────────────────
 
@@ -282,6 +286,28 @@ class App(tk.Tk):
         gc.collect()
         self.lbl_status.config(text="● Connecting…", fg=DIM)
         self.after(500, self._connect)
+
+    def _reset_usb(self):
+        if self._poll_job:
+            self.after_cancel(self._poll_job)
+            self._poll_job = None
+        with self._lock:
+            if self.julabo:
+                self.julabo.close()
+            self.julabo = None
+        gc.collect()
+        self.lbl_status.config(text="● Resetting USB…", fg=DIM)
+        self._msg("Resetting Prolific USB driver — approve UAC prompt…")
+        ps1 = os.path.join(os.path.dirname(os.path.abspath(__file__)), "reset_usb.ps1")
+        def task():
+            subprocess.run(
+                ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass",
+                 "-Command", f'Start-Process powershell -Verb RunAs -Wait -ArgumentList \'-NoProfile -ExecutionPolicy Bypass -File "{ps1}"\''],
+                capture_output=True
+            )
+            self.after(0, lambda: self._msg("USB reset done — reconnecting…"))
+            self.after(2000, self._connect)
+        threading.Thread(target=task, daemon=True).start()
 
     # ── polling ───────────────────────────────────────────────────────────────
 
