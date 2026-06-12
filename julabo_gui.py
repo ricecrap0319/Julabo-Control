@@ -120,6 +120,8 @@ class JulaboHE:
         time.sleep(0.3)
         self._cmd("out_mode_04 1")
     def stop(self):
+        self._cmd("out_mode_05 0")
+        time.sleep(0.3)
         self._cmd("out_mode_04 0")
 
 
