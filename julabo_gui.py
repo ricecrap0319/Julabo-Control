@@ -120,8 +120,6 @@ class JulaboHE:
         time.sleep(0.3)
         self._cmd("out_mode_04 1")
     def stop(self):
-        self._cmd("out_mode_05 0")
-        time.sleep(0.3)
         self._cmd("out_mode_04 0")
 
 
@@ -395,7 +393,7 @@ class App(tk.Tk):
 
     def _start(self):
         self._run(lambda: self.julabo.start(), "Start sent")
-
+'''Function for stopping the Julabo device. It sends a command to the device to stop its operation and updates the message label with a confirmation message.'''
     def _stop(self):
         self._run(lambda: self.julabo.stop(), "Stop sent")
 
