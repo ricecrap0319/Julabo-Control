@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(\"C:\\\\Users\\\\mingx\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python312\\\\python.exe\" \"C:\\\\Julabo Control\\\\julabo_gui.py\")"
-    ]
-  }
-}
